@@ -58,7 +58,7 @@ local tab2 = main.create_tab('Visual')
 local nurysium_Data = nil
 local hit_Sound = nil
 local closest_Entity = nil
-local parry_remote = nil
+local originalParryRemote = nil
 
 local function initialize_hit_sound(dataFolder_name)
     nurysium_Data = Instance.new('Folder', CoreGui)
@@ -86,21 +86,21 @@ local function get_closest_entity(object)
     return closest_Entity
 end
 
-local function resolve_parry_remote()
-    local services = {
-        game:GetService('AdService'),
-        game:GetService('SocialService')
-    }
-
-    for _, service in pairs(services) do
-        local temp_remote = service:FindFirstChildOfClass('RemoteEvent')
-
-        if temp_remote and temp_remote.Name:find('\n') then
-            parry_remote = temp_remote
-            break
-        end
+function resolve_parry_Remote()
+    local temp_remote = game:GetService("VirtualUser"):WaitForChild("\n\n\n\n\n")
+    if not temp_remote then
+        print("No RemoteEvent found.") -- Debug: Tidak ada RemoteEvent
+        return
     end
+    if not temp_remote:IsA('RemoteEvent') then
+        print("Found object is not a RemoteEvent.") -- Debug: Bukan RemoteEvent
+        return
+    end
+    originalParryRemote = temp_remote
+    print("RemoteEvent resolved successfully.") -- Debug: RemoteEvent berhasil
 end
+
+resolve_parry_Remote()
 
 -- Event Handlers
 if ReplicatedStorage:FindFirstChild('Remotes') and ReplicatedStorage.Remotes:FindFirstChild('ParrySuccess') then
@@ -289,7 +289,7 @@ task.spawn(function()
                             if getgenv().antiCurve_Enabled then
                                 target_position = camera.CFrame.Position + (target_position - camera.CFrame.Position).Unit * (local_player:DistanceFromCharacter(target_position) - 5)
                             end
-                            parry_remote:FireServer(
+                            originalParryRemote:FireServer(
                                 0.5,
                                 CFrame.new(camera.CFrame.Position, Vector3.zero),
                                 {[closest_Entity.Name] = target_position},
@@ -487,4 +487,4 @@ end)
 -- Start auto-spam detection
 task.spawn(detectAutoSpam)
 
-print("hello lovely skidder its me kia_ainsleyy")
+print("Script is running , This is a skidder maybe. but by me (Rudert)")
