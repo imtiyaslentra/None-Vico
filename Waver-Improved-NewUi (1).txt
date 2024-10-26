@@ -20,7 +20,9 @@ local function loadLibrary(url)
 end
 
 local Nurysium_Util = loadLibrary('https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua')
-local library = loadLibrary('https://raw.githubusercontent.com/Tevfnisass/Ui-Modules/main/Ui-Lib-Module.lua.txt')
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 if not Nurysium_Util or not library then
     return -- Exit if libraries fail to load
@@ -46,13 +48,6 @@ local learningData = {
     lastFailureTime = 0,
     lastSuccessTime = 0
 }
-
--- Library UI Initialization
-task.wait(1)
-local main = library.new()
-local tab = main.create_tab('Main')
-local tab1 = main.create_tab('Optimize')
-local tab2 = main.create_tab('Visual')
 
 -- Utility Functions
 local nurysium_Data = nil
@@ -383,64 +378,201 @@ end)
 initialize_hit_sound('nurysium_temp')
 
 -- UI Elements
-tab.create_toggle({
-    name = 'Auto Parry',
-    flag = 'autoparry',
-    section = 'left',
-    enabled = false,
-    callback = function(toggled)
-       resolve_parry_remote()
-       getgenv().aura_Enabled = toggled
-    end
+
+local Window = Fluent:CreateWindow({
+    Title = "Fluent " .. Fluent.Version,
+    SubTitle = "by dawid",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
-tab.create_toggle({
-    name = 'Auto Spam',
-    flag = 'autospam',
-    section = 'right',
-    enabled = false,
-    callback = function(toggled)
-        getgenv().autoSpam_Enabled = toggled
-    end
+-- Tab Creation
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- Notifications
+Fluent:Notify({
+    Title = "Fluent",
+    Content = "The script has been loaded.",
+    Duration = 8
 })
 
-tab1.create_toggle({
-    name = 'Optimize',
-    flag = 'optimize',
-    section = 'left',
-    enabled = false,
-    callback = function(toggled)
-        getgenv().optimize_Enabled = toggled
-    end
+-- Toggle: Auto Parry
+local AutoParryToggle = Tabs.Main:AddToggle("AutoParry", {
+    Title = "Auto Parry",
+    Default = false
 })
+AutoParryToggle:OnChanged(function(enabled)
+    getgenv().aura_Enabled = enabled
+    resolve_parry_remote()
+    Fluent:Notify({
+        Title = "Auto Parry",
+        Content = enabled and "Auto Parry Enabled" or "Auto Parry Disabled",
+        Duration = 5
+    })
+end)
 
-tab.create_toggle({
-    name = 'Anti Curve',
-    flag = 'anticurve',
-    section = 'left',
-    enabled = false,
-    callback = function(toggled)
-        getgenv().antiCurve_Enabled = toggled
-    end
+-- Toggle: Auto Spam
+local AutoSpamToggle = Tabs.Main:AddToggle("AutoSpam", {
+    Title = "Auto Spam",
+    Default = false
 })
+AutoSpamToggle:OnChanged(function(enabled)
+    getgenv().autoSpam_Enabled = enabled
+    Fluent:Notify({
+        Title = "Auto Spam",
+        Content = enabled and "Auto Spam Enabled" or "Auto Spam Disabled",
+        Duration = 5
+    })
+end)
 
-tab2.create_toggle({
-    name = 'Visualizer',
-    flag = 'visualiser',
-    section = 'left',
-    enabled = false,
-    callback = function(toggled)
-        getgenv().visualizer_Enabled = toggled
-        if toggled then
-            createVisualizer()
-        else
-            if visualizer then
-                visualizer:Destroy()
-                visualizer = nil
-            end
+-- Toggle: Optimize
+local OptimizeToggle = Tabs.Settings:AddToggle("Optimize", {
+    Title = "Optimize",
+    Default = false
+})
+OptimizeToggle:OnChanged(function(enabled)
+    getgenv().optimize_Enabled = enabled
+    Fluent:Notify({
+        Title = "Optimize",
+        Content = enabled and "Optimize Mode Enabled" or "Optimize Mode Disabled",
+        Duration = 5
+    })
+end)
+
+-- Toggle: Anti Curve
+local AntiCurveToggle = Tabs.Main:AddToggle("AntiCurve", {
+    Title = "Anti Curve",
+    Default = false
+})
+AntiCurveToggle:OnChanged(function(enabled)
+    getgenv().antiCurve_Enabled = enabled
+    Fluent:Notify({
+        Title = "Anti Curve",
+        Content = enabled and "Anti Curve Enabled" or "Anti Curve Disabled",
+        Duration = 5
+    })
+end)
+
+-- Toggle: Visualizer
+local VisualizerToggle = Tabs.Main:AddToggle("Visualizer", {
+    Title = "Visualizer",
+    Default = false
+})
+VisualizerToggle:OnChanged(function(enabled)
+    getgenv().visualizer_Enabled = enabled
+    if enabled then
+        createVisualizer()
+        Fluent:Notify({
+            Title = "Visualizer",
+            Content = "Visualizer Enabled",
+            Duration = 5
+        })
+    else
+        if visualizer then
+            visualizer:Destroy()
+            visualizer = nil
         end
+        Fluent:Notify({
+            Title = "Visualizer",
+            Content = "Visualizer Disabled",
+            Duration = 5
+        })
+    end
+end)
+
+-- Paragraph and Button Example
+Tabs.Main:AddParagraph({
+    Title = "Information",
+    Content = "This is an example paragraph."
+})
+Tabs.Main:AddButton({
+    Title = "Important Button",
+    Description = "Triggers a dialog box",
+    Callback = function()
+        Window:Dialog({
+            Title = "Confirmation",
+            Content = "Are you sure you want to proceed?",
+            Buttons = {
+                { Title = "Confirm", Callback = function() print("Confirmed!") end },
+                { Title = "Cancel", Callback = function() print("Cancelled!") end }
+            }
+        })
     end
 })
+
+-- Slider Example
+local Slider = Tabs.Main:AddSlider("Slider", {
+    Title = "Adjustable Slider",
+    Description = "A slider example",
+    Default = 2,
+    Min = 0,
+    Max = 5,
+    Rounding = 1
+})
+Slider:OnChanged(function(value)
+    print("Slider value:", value)
+end)
+
+-- Dropdown Example
+local Dropdown = Tabs.Main:AddDropdown("Dropdown", {
+    Title = "Select an Option",
+    Values = {"Option 1", "Option 2", "Option 3"},
+    Multi = false,
+    Default = 1
+})
+Dropdown:OnChanged(function(value)
+    print("Dropdown selected:", value)
+end)
+
+-- Color Picker Example
+local Colorpicker = Tabs.Main:AddColorpicker("Colorpicker", {
+    Title = "Select a Color",
+    Default = Color3.fromRGB(96, 205, 255)
+})
+Colorpicker:OnChanged(function()
+    print("Colorpicker changed:", Colorpicker.Value)
+end)
+
+-- Keybind Example
+local Keybind = Tabs.Main:AddKeybind("Keybind", {
+    Title = "Toggle Keybind",
+    Mode = "Toggle",
+    Default = "LeftControl"
+})
+Keybind:OnChanged(function()
+    print("Keybind pressed:", Keybind.Value)
+end)
+
+-- Input Field Example
+local Input = Tabs.Main:AddInput("Input", {
+    Title = "Type something",
+    Placeholder = "Enter text here",
+    Callback = function(value)
+        print("Input value:", value)
+    end
+})
+
+-- Save and Interface Management
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+SaveManager:LoadAutoloadConfig()
 
 -- Optimization Function
 local Optimizer = {}
