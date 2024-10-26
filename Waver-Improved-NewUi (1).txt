@@ -348,7 +348,7 @@ task.spawn(function()
                 if getgenv().antiCurve_Enabled then
                     target_position = camera.CFrame.Position + (target_position - camera.CFrame.Position).Unit * (local_player:DistanceFromCharacter(target_position) - 5)
                 end
-                parry_remote:FireServer(
+                originalParryRemote:FireServer(
                     0.5,
                     CFrame.new(camera.CFrame.Position, target_position),
                     {[closest_Entity.Name] = target_position},
