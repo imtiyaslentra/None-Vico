@@ -7,26 +7,8 @@ local Workspace = game:GetService('Workspace')
 local CoreGui = game:GetService('CoreGui')
 local UserInputService = game:GetService("UserInputService")
 
--- Load Libraries
-local function loadLibrary(url)
-    local success, library = pcall(function()
-        return loadstring(game:HttpGet(url))()
-    end)
-    if not success then
-        warn("Failed to load library from " .. url)
-        return nil
-    end
-    return library
-end
-
+-- load Nury.
 local Nurysium_Util = loadLibrary('https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_helper.lua')
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
-if not Nurysium_Util or not Fluent then
-    return -- Exit if libraries fail to load
-end
 
 -- Player and Camera
 local local_player = Players.LocalPlayer
@@ -378,10 +360,13 @@ end)
 initialize_hit_sound('nurysium_temp')
 
 -- UI Elements
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Fluent " .. Fluent.Version,
-    SubTitle = "by dawid",
+    Title = "Vico - Blade ball"
+    SubTitle = "This Is Vico! By Rudert.",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
